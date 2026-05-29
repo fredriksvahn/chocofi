@@ -1,0 +1,321 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+
+// Position-konstanter för bilateral HRM
+// Chocofi = Corne minus outer pinky-kolumn (pos 0, 11, 12, 23, 24, 35 = &none)
+#define KEYS_L 1 2 3 4 5 13 14 15 16 17 25 26 27 28 29
+#define KEYS_R 6 7 8 9 10 18 19 20 21 22 30 31 32 33 34
+#define THUMBS 36 37 38 39 40 41
+
+// Layer definitions
+#define BASE 0
+#define NAV 1
+#define SYM 2
+#define NUM 3
+#define FUN 4
+#define MEDIA 5
+#define WM 6
+#define SE 7
+
+/ {
+    behaviors {
+        hml: home_row_mod_left {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <280>;
+            quick-tap-ms = <175>;
+            require-prior-idle-ms = <150>;
+            hold-trigger-on-release;
+            hold-trigger-key-positions = <KEYS_R THUMBS>;
+            bindings = <&kp>, <&kp>;
+        };
+
+        hmr: home_row_mod_right {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "balanced";
+            tapping-term-ms = <280>;
+            quick-tap-ms = <175>;
+            require-prior-idle-ms = <150>;
+            hold-trigger-on-release;
+            hold-trigger-key-positions = <KEYS_L THUMBS>;
+            bindings = <&kp>, <&kp>;
+        };
+
+        // Thumb layer-tap: tap-preferred för robust space/enter/bspc/tab
+        lts: layer_tap_thumb {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <175>;
+            bindings = <&mo>, <&kp>;
+        };
+    };
+
+    macros {
+        // Windows Alt-codes för svenska tecken
+        // Funkar oavsett OS keyboard-layout (kräver NumLock på)
+        sw_aa: swedish_aa {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_press &kp LALT>,
+                       <&macro_tap &kp KP_N0 &kp KP_N2 &kp KP_N2 &kp KP_N9>,
+                       <&macro_release &kp LALT>;
+        };
+
+        sw_ae: swedish_ae {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_press &kp LALT>,
+                       <&macro_tap &kp KP_N0 &kp KP_N2 &kp KP_N2 &kp KP_N8>,
+                       <&macro_release &kp LALT>;
+        };
+
+        sw_oe: swedish_oe {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_press &kp LALT>,
+                       <&macro_tap &kp KP_N0 &kp KP_N2 &kp KP_N4 &kp KP_N6>,
+                       <&macro_release &kp LALT>;
+        };
+    };
+
+    combos {
+        compatible = "zmk,combos";
+
+        // Sticky-shift: vänster middle + index, bottenrad (C + D)
+        combo_sticky_shift {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <27 28>;
+            bindings = <&sk LSHFT>;
+        };
+
+        // Caps-word: vänster middle + index, topp-rad (F + P)
+        combo_caps_word {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <3 4>;
+            bindings = <&caps_word>;
+        };
+
+        // ESC: vänster ring + middle, topp-rad (Q + W)
+        combo_esc {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <1 2>;
+            bindings = <&kp ESC>;
+        };
+
+        // Parens (
+        combo_lpar {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <8 9>;
+            bindings = <&kp LPAR>;
+        };
+
+        // Parens )
+        combo_rpar {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <7 8>;
+            bindings = <&kp RPAR>;
+        };
+
+        // Brackets [
+        combo_lbkt {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <18 19>;
+            bindings = <&kp LBKT>;
+        };
+
+        // Brackets ]
+        combo_rbkt {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <19 20>;
+            bindings = <&kp RBKT>;
+        };
+
+        // Braces {
+        combo_lbrc {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <32 33>;
+            bindings = <&kp LBRC>;
+        };
+
+        // Braces }
+        combo_rbrc {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <33 34>;
+            bindings = <&kp RBRC>;
+        };
+
+        // Undo (Ctrl+Z)
+        combo_undo {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <25 26>;
+            bindings = <&kp LC(Z)>;
+        };
+
+        // Panic — yttre tummar = tillbaka till base layer (alltid)
+        combo_to_base {
+            timeout-ms = <80>;
+            require-prior-idle-ms = <0>;
+            key-positions = <36 41>;
+            bindings = <&to 0>;
+        };
+
+        // Bootloader — 3-key Q + B + ;
+        combo_bootloader {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <500>;
+            key-positions = <1 5 10>;
+            bindings = <&bootloader>;
+        };
+
+        // Bootloader backup — yttre kanter botten (Z + /)
+        combo_bootloader_alt {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <500>;
+            key-positions = <25 34>;
+            bindings = <&bootloader>;
+        };
+
+        // SE-trigger — sticky-layer för svenska bokstäver
+        // Y + ; (höger pinky-area, sällan i normalt typing)
+        combo_se {
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+            key-positions = <9 10>;
+            bindings = <&sl SE>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        base_layer {
+            display-name = "Base";
+// ---------------------------------------------------------------------------------------------------
+// | _   |   Q   |   W   |   F   |   P   |  B  |   |  J  |   L   |   U   |   Y   |  ;  |  _   |
+// | _   | GUI A | ALT R | CTL S |   T   |  G  |   |  M  |   N   | CTL E | ALT I | GUI O|  _   |
+// | _   |   Z   |   X   |   C   |   D   |  V  |   |  K  |   H   |   ,   |   .   |  /   |  _   |
+//                              ESC/MEDIA | WM | NAV/SPC | SYM/RET | NUM/BSPC | FUN/TAB
+            bindings = <
+   &none    &kp Q        &kp W        &kp F        &kp P        &kp B           &kp J        &kp L        &kp U         &kp Y         &kp SEMI     &none
+   &none    &hml LGUI A  &hml LALT R  &hml LCTRL S &kp T        &kp G           &kp M        &kp N        &hmr RCTRL E  &hmr RALT I   &hmr RGUI O  &none
+   &none    &kp Z        &kp X        &kp C        &kp D        &kp V           &kp K        &kp H        &kp COMMA     &kp DOT       &kp FSLH     &none
+                                  &lt MEDIA ESC    &mo WM       &lts NAV SPACE  &lts SYM RET &lts NUM BSPC &lts FUN TAB
+            >;
+        };
+
+        nav_layer {
+            display-name = "Nav";
+// ---------------------------------------------------------------------------------------------------
+// | _   |   _   |   _   |   _   |   _   |  _  |   | HOME | PgUp | PgDn |  End  |   _   |  _   |
+// | _   |  GUI  |  ALT  |  CTL  |  SHF  |  _  |   |  ←   |   ↓  |   ↑  |   →   | CAPS  |  _   |
+// | _   | C+Z   | C+X   | C+C   | C+V   |  _  |   |  INS | TAB  |   _  |   _   |   _   |  _   |
+            bindings = <
+   &none    &trans       &trans       &trans       &trans       &trans          &kp HOME     &kp PG_UP    &kp PG_DN     &kp END       &trans        &none
+   &none    &sk LGUI     &sk LALT     &sk LCTRL    &sk LSHFT    &trans          &kp LEFT     &kp DOWN     &kp UP        &kp RIGHT     &kp CAPS      &none
+   &none    &kp LC(Z)    &kp LC(X)    &kp LC(C)    &kp LC(V)    &trans          &kp INS      &kp TAB      &trans        &trans        &trans        &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+
+        sym_layer {
+            display-name = "Sym";
+// ---------------------------------------------------------------------------------------------------
+// | _   |  !  |  @  |  #  |  $  |  %  |   |  ^  |  &  |  *  |  (  |  )  |  _  |
+// | _   |  ~  |  _  |  +  |  =  |  |  |   |  :  |  ;  |  "  |  '  |  `  |  _  |
+// | _   |  \  |  -  |  /  |  *  |  &  |   |  ?  |  [  |  ]  |  {  |  }  |  _  |
+            bindings = <
+   &none    &kp EXCL     &kp AT       &kp HASH     &kp DLLR     &kp PRCNT       &kp CARET    &kp AMPS     &kp ASTRK     &kp LPAR      &kp RPAR      &none
+   &none    &kp TILDE    &kp UNDER    &kp PLUS     &kp EQUAL    &kp PIPE        &kp COLON    &kp SEMI     &kp DQT       &kp SQT       &kp GRAVE     &none
+   &none    &kp BSLH     &kp MINUS    &kp FSLH     &kp ASTRK    &kp AMPS        &kp QMARK    &kp LBKT     &kp RBKT      &kp LBRC      &kp RBRC      &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+
+        num_layer {
+            display-name = "Num";
+// ---------------------------------------------------------------------------------------------------
+// | _   |   _   |   _   |   _   |   _   |  _  |   |  +  |   7  |   8  |   9   |   *   |  _   |
+// | _   |  GUI  |  ALT  |  CTL  |  SHF  |  _  |   |  -  |   4  |   5  |   6   |   /   |  _   |
+// | _   |   _   |   _   |   _   |   _   |  _  |   |  0  |   1  |   2  |   3   |   .   |  _   |
+            bindings = <
+   &none    &trans       &trans       &trans       &trans       &trans          &kp PLUS     &kp N7       &kp N8        &kp N9        &kp ASTRK     &none
+   &none    &sk LGUI     &sk LALT     &sk LCTRL    &sk LSHFT    &trans          &kp MINUS    &kp N4       &kp N5        &kp N6        &kp FSLH      &none
+   &none    &trans       &trans       &trans       &trans       &trans          &kp N0       &kp N1       &kp N2        &kp N3        &kp DOT       &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+
+        fun_layer {
+            display-name = "Fun";
+// ---------------------------------------------------------------------------------------------------
+// | _   |  F12  |  F7   |  F8   |  F9   |  _  |   | BT0  | BT1  | BT2  | BT3   | BT4   |  _   |
+// | _   |  F11  |  F4   |  F5   |  F6   |  _  |   |  _   |  _   |  _   |  _    | BTCLR |  _   |
+// | _   |  F10  |  F1   |  F2   |  F3   |  _  |   |  _   |  _   |  _   |  _    |  _    |  _   |
+            bindings = <
+   &none    &kp F12      &kp F7       &kp F8       &kp F9       &trans          &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4  &none
+   &none    &kp F11      &kp F4       &kp F5       &kp F6       &trans          &trans       &trans       &trans        &trans        &bt BT_CLR    &none
+   &none    &kp F10      &kp F1       &kp F2       &kp F3       &trans          &trans       &trans       &trans        &trans        &trans        &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+
+        media_layer {
+            display-name = "Media";
+// ---------------------------------------------------------------------------------------------------
+// | _   |   _   |   _   |   _   |   _   |  _  |   | PREV | VOL- | VOL+ | NEXT |  _   |  _   |
+// | _   |  GUI  |  ALT  |  CTL  |  SHF  |  _  |   | BRI- | MUTE | PLAY | BRI+ |  _   |  _   |
+// | _   |   _   |   _   |   _   |   _   |  _  |   |  _   |  _   |  _   |  _   |  _   |  _   |
+            bindings = <
+   &none    &trans       &trans       &trans       &trans       &trans          &kp C_PREV   &kp C_VOL_DN &kp C_VOL_UP  &kp C_NEXT    &trans        &none
+   &none    &sk LGUI     &sk LALT     &sk LCTRL    &sk LSHFT    &trans          &kp C_BRI_DN &kp C_MUTE   &kp C_PP      &kp C_BRI_UP  &trans        &none
+   &none    &trans       &trans       &trans       &trans       &trans          &trans       &trans       &trans        &trans        &trans        &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+
+        wm_layer {
+            display-name = "WM";
+// ---------------------------------------------------------------------------------------------------
+// | _   |   _   |   _   |   _   |   _   |  _  |   | A+1  | A+2  | A+3  | A+4  | A+5  |  _   |
+// | _   |   _   |   _   |   _   |   _   |  _  |   | A+6  | A+←  | A+↓  | A+↑  | A+→  |  _   |
+// | _   |   _   |   _   |   _   |   _   |  _  |   |  _   |  _   |  _   |  _   |  _   |  _   |
+            bindings = <
+   &none    &trans       &trans       &trans       &trans       &trans          &kp LA(N1)   &kp LA(N2)   &kp LA(N3)    &kp LA(N4)    &kp LA(N5)    &none
+   &none    &trans       &trans       &trans       &trans       &trans          &kp LA(N6)   &kp LA(LEFT) &kp LA(DOWN)  &kp LA(UP)    &kp LA(RIGHT) &none
+   &none    &trans       &trans       &trans       &trans       &trans          &trans       &trans       &trans        &trans        &trans        &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+
+        se_layer {
+            display-name = "SE";
+// ---------------------------------------------------------------------------------------------------
+// | _   |   _   |   _   |   _   |   _   |  _  |   |  _   |  _   |  _   |  _   |  _   |  _   |
+// | _   |   å   |   _   |   _   |   _   |  _  |   |  _   |  _   |  _   |  _   |  ö   |  _   |
+// | _   |   ä   |   _   |   _   |   _   |  _  |   |  _   |  _   |  _   |  _   |  _   |  _   |
+//                                  _    |  _  | _ |  _   |  _   |  _
+            bindings = <
+   &none    &trans       &trans       &trans       &trans       &trans          &trans       &trans       &trans        &trans        &trans        &none
+   &none    &sw_aa       &trans       &trans       &trans       &trans          &trans       &trans       &trans        &trans        &sw_oe        &none
+   &none    &sw_ae       &trans       &trans       &trans       &trans          &trans       &trans       &trans        &trans        &trans        &none
+                                      &trans       &trans       &trans          &trans       &trans       &trans
+            >;
+        };
+    };
+};
